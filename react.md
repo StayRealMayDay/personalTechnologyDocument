@@ -611,3 +611,6 @@ componentWillUnmount：在组件从 DOM 中移除的时候立刻被调用。
 "date-fns": "next",
 ```
 这个依赖，在package.json里面版本是next。
+
+## 响应包的状态为 cancled
+原因： 多半是因为form表单自己带有提交功能，在回车的时候，表单会自动提交，但是你又触发了其他的提交请求，那么就会导致这一情况的发生

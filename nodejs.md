@@ -766,3 +766,70 @@ promise前面的await关键字能够使JavaScript等待，直到promise处理结
 他们一起提供了一个很好的框架来编写易于读写的异步代码。
 
 有了async/await，我们很少需要写promise.then/catch，但是我们仍然不应该忘记它们是基于promise的，因为有些时候（例如在最外面的范围内）我们不得不使用这些方法。Promise.all也是一个非常棒的东西，它能够同时等待很多任务。
+
+
+## express-session
+相关链接：
+
+https://www.cnblogs.com/xiashan17/p/5897282.html
+
+https://cloud.tencent.com/developer/news/198738
+
+具体来说，再使用express-session中间件之后，可以在其中设置`saveUninitialized : true`这样一个选项， 在这样设置之后只要去访问这个服务器就会生成一个session，当然前提是还没生成的情况，如果已经生成了就不会再生成了，生成一个session之后呢，在服务器的返回头上会多一个Set_Cookie字段，这个字段其实是sessionID加密之后的数据，浏览器保存这个cookie在下次访问的时候，带上这个cookie，服务器就会拿到这个sessionID然后找到之前生成的session，session还可以记录一些信息，然后通过sessionID找到该session然后拿到该信息，比如登录确认啥的。
+
+rolling:true字段呢是来重新更新过期时间的。等等
+
+**session的过程**
+
+https://blog.csdn.net/nw_ningwang/article/details/78500761
+## fetch默认不自带cookie
+需要自带cookie需要设置一个字段,在fetch请求时
+```
+credentials：
+```
+credentials有三个值可以配置， 默认是:‘omit’， 即忽略cookie ‘same-origin’： 同域名下请求会发送cookie。 'include‘：是否同域名都会发送cookie
+
+在默认带上cookie之后，比如选择了'include'后台的跨域访问路径需要修改。
+```
+res.header("Access-Control-Allow-Origin", "htt://localhost:3000");   //这里要写具体请求地址
+res.header(" Access-Control-Allow-Credentials", true);
+```
+如果地址写 "*"会报错。 在这样设置之后Chrome还是无法使用document.cookie来看cookie，我也不知道怎么回事。
+
+## express获取post请求参数
+
+```
+const express = require('express');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const app = express();
+
+
+app.use(bodyParser.urlencoded({extended: true}));
+//这两个只会有一个起作用，建议都写上
+app.use(bodyParser.json());
+```
+
+## 请求URL编码问题
+js有三个函数,
+```
+escape（69个）：*/@+-._0-9a-zA-Z
+encodeURI（82个）：!#$&'()*+,/:;=?@-._~0-9a-zA-Z
+encodeURIComponent（71个）：!'()*-._~0-9a-zA-Z
+```
+函数后面的字符为安全字符，即不会对这些字符进行编码。在进行网络请求的时候，请求模块在发送请求的时候会自动把url进行编码，然后再请求，这个可以Wireshark抓包来看，有的网站制定了编码方式，即使你的链接是对的，但是你请求的时候编码方式不对，也是拿不到数据的。
+
+## https
+HTTPS 就是在原来的http上加了一层，要么是SSL，安全套接曾，或者TLS，传输层安全，其原理是结合对称加密和非对称加密，首先使用非对称加密来传输对称加密的密钥，之后使用对称加密来进行数据传输，非对称加密的时候，可以通过三个随机数来生成一个密钥，这个是在建立安全链接的时候，即握手的时候产生的。随机数是在客户端和服务器自己产生的，所以中间人是不知道的，这样就导致中间人无法解密加密信息。
+
+其实最核心的是，客户端是用服务器的公钥加密，中间人没有服务器的私钥，所以没法解密获取对称加密的方法和密钥，所以无法中间人劫持，唯一的方法是伪造证书，使得客户端能够相信中间人的证书，这样的话你在截获第一个握手的时候开始，就获取第一个返回的数据，解析之后换成自己的证书，这样就能和客户端，以及服务器分别商量对称加密的算法和密钥，这样一来就能截获客户端的数据了。
+具体的流程是：
+1. 客户端请求
+
+2. 服务器返回数据，将公钥用证书加密。
+
+3. 客户端看证书是否信任，信任则用其对应的公钥解密， 获取服务公钥，
+
+4. 用服务器公钥加密数据，设置对称传输的密钥和方法
+
+5.使用密钥回复 ，传输数据。

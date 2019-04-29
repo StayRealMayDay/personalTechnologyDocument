@@ -180,3 +180,7 @@ sudo iptables -D INPUT -p tcp --dport $PORT -j DROP
 sudo iptables -A INPUT -p tcp --dport $PORT
 sudo iptables -A OUTPUT -p tcp --sport $PORT
 ```
+### 查看结果
+```
+iptables -L -v -n -x
+```

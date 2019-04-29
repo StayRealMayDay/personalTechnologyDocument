@@ -766,3 +766,12 @@ export default function* rootSaga() {
   yield takeEvery('CREATE_USER', createUser)
 }
 ```
+## 部署注意点
+在添加redux之后，在部署的时候需要把开发工具去去掉。
+```
+const store = createStore(reducer, compose(applyMiddleware(sagas),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()));
+```
+这里变成
+```
+const store = createStore(reducer, compose(applyMiddleware(sagas)));
+```
